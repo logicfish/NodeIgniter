@@ -19,6 +19,10 @@ Proposed structure
 
 ### Module folder structure
 
+* modules.js - exports.**name** = ...
+
+or:
+
 * modules/index.js - exports.**name** = ...
 
 or:
@@ -55,6 +59,8 @@ Configuration objects are also managed using prototypes, so that all modules acc
 ### Ideas
 
 Supports but does not require the HMVC pattern.
+
+The loader can run 'npm install' inline to initialise modules with a package.json descriptor, and can install ni-modules from listed npm dependencies.
 
 Modules can override default settings in *module.json* .
 Modules and applications can override default behaviour by creating classes prefixed with MY for example MY _ Configuration .
