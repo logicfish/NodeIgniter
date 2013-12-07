@@ -45,16 +45,19 @@ or
 or
 
 * config/**name**/index.json
+* config/**name**/**config**.json
 
 Module meta-data:
-* config/modules.json
-* modules/**name**/module.json
+* config/module.json - this module.
+* config/modules.json - child modules.
+* modules/**name**/config/module.json - info about a sub-module.
 
 #### Structure of the *modules* folder
 
 * modules/**name**/config/**configname**.json
 * modules/**name**/modules/<.. embedded modules ..>
 
+Modules may have nested sub-modules to any level.  If more than one module or sub-module shares the same name-space, then local overrides take precedence; that is, if a module contains a sub-module matching an already defined modules namespace, then the module and it's children will view the overridden module, rather than the global version. 
 
 Module names are entered in a global registry, however if a module contains a sub-module with the same name as a global entry, the sub-module will override the global module, inside it's parent module.  This is acheived by using the global module's exported object as the prototype for the sub-module's exported object.
 
@@ -79,6 +82,8 @@ The _module.resources_, _module.models_ and _module.views_ objects are automatic
 Users can override the default loaders for the automatically assigned classes by creating the classes MY _ Model and MY _ View (MY _  followed by the name of the loader with the initial letter capitialised) which will be loaded by the framework instead of the default loader classes.  The default system loader is NI _ ResourceLoader .  A MY _ ResourceLoader class would override the default loader.  
 Loaders default to using a require(...) statement to create the resource object, and assign a property of the same name to it's prototype with it's value as the resource object.  
 
+Temporary file space
+* tmp/**name**/<... temporary files ...>
 
 ### Loading Semantics
 
