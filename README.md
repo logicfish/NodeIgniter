@@ -9,32 +9,65 @@ Proposed structure
 
 ### Module loading
 
-var NodeIgniter = require('node-igniter');
+	var NodeIgniter = require('node-igniter');
 
-var NI = new NodeIgniter();
-var m = NI.load('modulename');
-var value = m.config('value');
+	var NI = new NodeIgniter();
+	var m = NI.load('modulename');
+	var myvalue = m.config('value').myvalue;
+	// the loaded data becomes available as a property on the module.config object.
+	var othervalue = m.config.value.othervalue;
 
 ### Module folder structure
 
-* modules/index.js - (exports 'modulename')
+* modules/index.js - export.**modulename** = ...
 
 or:
 
-* modules/*modulename*.js
+* modules/**modulename**.js
 
 or:
 
-* modules/*modulename*/index.js
+* modules/**modulename**/index.js
 
-#### Structure inside a module folder
+The same mechanism is used for configs, ie:
+* config/index.json - "**name**" : { ... }
 
-* modules/*modulename*/config/*configname*.json
-* modules/*modulename*/resources/<.. static file content ..>
-* modules/*modulename*/modules/<.. embedded modules ..>
+or
+
+* config/**name**.json
+
+or
+
+* config/**name**/index.json
+
+
+
+#### Structure of the *modules* folder
+
+* modules/**modulename**/config/**configname**.json
+* modules/**modulename**/resources/<.. static file content ..>
+* modules/**modulename**/modules/<.. embedded modules ..>
+
 
 Module names are entered in a global registry, however if a module contains a sub-module with the same name as a global entry, the sub-module will override the global module, inside it's parent module.  This is acheived by using the global module's exported object as the prototype for the sub-module's exported object.
+
 Configuration objects are also managed using prototypes, so that all modules access a global configuration set, and may also include their own private configurations which may include local overrides for global settings.  When a module is loaded, a unique configuration object is created for that module, with it's prototype set to the global configuration object.
+
+### Ideas
+
+Supports but does not require the HMVC pattern.
+
+Modules can override default settings in *module.json* .
+Modules and applications can override default behaviour by creating classes prefixed with MY for example MY _ Configuration .
+
+Automatically assign loaders to assignable objects, for example folders and .js files.
+
+* modules/**modulename**/model/ index.js | **name**.js | **name**/
+* modules/**modulename**/view/
+
+The module.model and module.views objects are automaticall created.
+Users can override the default loader by create the classes MY _ Model and MY _ View
+
 
 
 
@@ -50,7 +83,7 @@ Configuration objects are also managed using prototypes, so that all modules acc
 
 	// extend a module prototype inline.
 	var ni_request = NI.module.load('request',function(module){
-		var myvar = module.config('myvar');
+		this.myvar = module.config('myvar');
 	};
 
 
