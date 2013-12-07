@@ -12,22 +12,22 @@ Proposed structure
 	var NodeIgniter = require('node-igniter');
 
 	var NI = new NodeIgniter();
-	var m = NI.module('modulename');
-	var myvalue = m.config('value').myvalue;
+	var m = NI.module('name');
+	var myvalue = m.config('name').myvalue;
 	// the loaded data becomes available as a property on the module.config object.
-	var othervalue = m.config.value.othervalue;
+	var othervalue = m.config.name.othervalue;
 
 ### Module folder structure
 
-* modules/index.js - export.**modulename** = ...
+* modules/index.js - exports.**name** = ...
 
 or:
 
-* modules/**modulename**.js
+* modules/**name**.js
 
 or:
 
-* modules/**modulename**/index.js
+* modules/**name**/index.js
 
 The same mechanism is used for configs, ie:
 * config/index.json - "**name**" : { ... }
@@ -44,8 +44,8 @@ or
 
 #### Structure of the *modules* folder
 
-* modules/**modulename**/config/**configname**.json
-* modules/**modulename**/modules/<.. embedded modules ..>
+* modules/**name**/config/**configname**.json
+* modules/**name**/modules/<.. embedded modules ..>
 
 
 Module names are entered in a global registry, however if a module contains a sub-module with the same name as a global entry, the sub-module will override the global module, inside it's parent module.  This is acheived by using the global module's exported object as the prototype for the sub-module's exported object.
@@ -61,12 +61,13 @@ Modules and applications can override default behaviour by creating classes pref
 
 Automatically assign loaders to assignable objects, for example folders and .js files.
 
-* modules/**modulename**/resources/<.. static file content ..>
-* modules/**modulename**/models/ index.js | **name**.js | **name**/
-* modules/**modulename**/views/
+* modules/**name**/resources/<.. static file content ..>
+* modules/**name**/models/ index.js | **name**.js | **name**/
+* modules/**name**/views/
 
-The _module.resources_, _module.models_ and _module.views_ objects are automaticall created.
-Users can override the default loader by create the classes MY _ Model and MY _ View
+The _module.resources_, _module.models_ and _module.views_ objects are automatically created.  This enables clients to load objects using the _module.models('name')_ syntax, simply by creating the relevant folder.  The default folders, config and modules, are pre-registered to allow for their special semantics.  
+Users can override the default loaders for the automatically assigned classes by creating the classes MY _ Model and MY _ View (MY _  followed by the name of the loader with the initial letter capitialised) which will be loaded by the framework instead of the default loader classes.  The default system loader is NI _ ResourceLoader .  A MY _ ResourceLoader class would override the default loader.  
+Loaders default to using a require(...) statement to create the resource object, and assign a property of the same name to it's prototype with it's value as the resource object.  
 
 
 
