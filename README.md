@@ -28,10 +28,12 @@ or:
 or:
 
 * modules/**name**.js
+* modules/**name**-**version**.js
 
 or:
 
 * modules/**name**/index.js
+* modules/**name**/**version**/index.js
 
 The same mechanism is used for configs, ie:
 * config/index.json - "**name**" : { ... }
@@ -44,7 +46,9 @@ or
 
 * config/**name**/index.json
 
-
+Module meta-data:
+* config/modules.json
+* modules/**name**/module.json
 
 #### Structure of the *modules* folder
 
@@ -76,6 +80,13 @@ Users can override the default loaders for the automatically assigned classes by
 Loaders default to using a require(...) statement to create the resource object, and assign a property of the same name to it's prototype with it's value as the resource object.  
 
 
+### Loading Semantics
+
+Load different module versions and imported namespace.
+NI.module('name','0.1.1');
+NI.module('name','9.1.1','namespace');
+NI.module('name','0.1.1','namespace', callback);
+NI.module('name',callback);
 
 
 ### Examples:
@@ -97,5 +108,5 @@ Loaders default to using a require(...) statement to create the resource object,
 ### Resources
 Useful nodejs modules:
 * [autoload](https://github.com/laverdet/node-autoload)
-
+* [hashish](https://github.com/substack/node-hashish)
 
