@@ -12,7 +12,7 @@ Proposed structure
 	var NodeIgniter = require('node-igniter');
 
 	var NI = new NodeIgniter();
-	var m = NI.load('modulename');
+	var m = NI.module('modulename');
 	var myvalue = m.config('value').myvalue;
 	// the loaded data becomes available as a property on the module.config object.
 	var othervalue = m.config.value.othervalue;
@@ -45,7 +45,6 @@ or
 #### Structure of the *modules* folder
 
 * modules/**modulename**/config/**configname**.json
-* modules/**modulename**/resources/<.. static file content ..>
 * modules/**modulename**/modules/<.. embedded modules ..>
 
 
@@ -62,10 +61,11 @@ Modules and applications can override default behaviour by creating classes pref
 
 Automatically assign loaders to assignable objects, for example folders and .js files.
 
-* modules/**modulename**/model/ index.js | **name**.js | **name**/
-* modules/**modulename**/view/
+* modules/**modulename**/resources/<.. static file content ..>
+* modules/**modulename**/models/ index.js | **name**.js | **name**/
+* modules/**modulename**/views/
 
-The module.model and module.views objects are automaticall created.
+The _module.resources_, _module.models_ and _module.views_ objects are automaticall created.
 Users can override the default loader by create the classes MY _ Model and MY _ View
 
 
