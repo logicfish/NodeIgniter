@@ -82,7 +82,25 @@ The _module.resources_, _module.models_ and _module.views_ objects are automatic
 Users can override the default loaders for the automatically assigned classes by creating the classes MY _ Model and MY _ View (MY _  followed by the name of the loader with the initial letter capitialised) which will be loaded by the framework instead of the default loader classes.  The default system loader is NI _ ResourceLoader .  A MY _ ResourceLoader class would override the default loader.  
 Loaders default to using a require(...) statement to create the resource object, and assign a property of the same name to it's prototype with it's value as the resource object.  
 
-Temporary file space
+Module exports are added to class prototypes; when a module is imported an instance of the class is provided to the importing module.  The importing module can access the internal prototype by providing a callback which allows the importing module to modify the prototype for the module object representing the imported module.
+
+Exports are hashed by module name and version.  These are stored in a tree which maps the sub-module heirarchy.  When a request for an import occurs, the tree is scanned for a match against the exporting modules name and version.  The highest matching exporting module will be used to create the initial prototype.  We then create a new prototype which inherits the initial one, and pass this along to the import callback.  An import object is then created using the prototype.  This becomes a property of the importing module's 'module' object, using the namespace parameter as the name of the property.  Before doing this, the module config object is created.
+
+A module import may reference an npm module if their is a matching one available.  In this case, the module class prototype is created from the value returned by 'require(...)'.  Require is also used to load data objects from json files.
+
+### Local Module Configuration Prototypes
+
+The module config object is created during an import, before creating the import object (part of the module instance).  The config object also uses a prototype heirarchy to allow local overrides.  At the high end are config objects created from the exporting module's config/ folder (the config loader is used to read a configuration with the same name as the module).  If the module is a sub-module, parent modules are also scanned for config objects which are included in the prototype chain.  The exported config objects are attached to the module exports.  These are used to create prototypes for module imports, which allow for modules to override any of the config settings.  If a module contains a config with a name matching an imported module, the named config object will have it's prototype set to the config of the exporting module.  
+
+When an import occurs, the framework creates an object with it's prototype set to the value of the local config object (from the importing module) with the same name as the imported module.  This object is attached to the 'module' object which is passed to the callback in the importing module.  We're not done yet - we make a clone of the application (global) config object of the same name as the importing module; we set this objects prototype to the object we just created.  This is the object that will be attached to the module instance, and available to functions inside the module to access their config settigns.  This gives files in the application's top level configs/ folder (and the config.js file) a special power.  They allow us to override per-module settings globally.  
+
+When functions defined in a module access their local configuration, they will be accessing the object created during the module import, containing local per-module (and per-import) overrides.
+
+The callback method of the loader functions allow for modification of the config prototypes.
+
+
+
+### Module Temporary file space
 * tmp/**name**/<... temporary files ...>
 
 ### Loading Semantics
