@@ -1,0 +1,5 @@
+{
+	"express-router" : {},
+	"http-server" : { "port" : "4080" },
+	"https-server" : { "port" : "4443", "cert" : "cert.pem", "key" : "key.pem" } 
+}

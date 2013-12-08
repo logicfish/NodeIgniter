@@ -9,8 +9,9 @@ module.exports.NI = new NodeIgniter();
 
 // Default resource.
 // This class wraps the classloader.
-// TODO refactor the code below into this class using extends library, and property setters.
-function NI_Resource() {
+// TODO refactor the code below into classes using extends library, and proper definition of properties.
+function NI_Resource(type) {
+	this._type = type;
 };
 
 NI_Resource.prototype.object = function() {
@@ -19,10 +20,13 @@ NI_Resource.prototype.object = function() {
 	return new F();
 };
 
+NI_Resource.prototype.load = function(name,param) {
+};
+
 // Module loader.  
 
 function NI_ModuleLoader() {
-	var it = function(name,param,callback) {
+	var it = function(name,param,callback) { // move to NI_Resource
 		var namespace = name;
 		if(typeof param.namespace !== 'undefined') {
 			namespace = param.namespace;
@@ -35,9 +39,11 @@ function NI_ModuleLoader() {
 		}
 		else return this.load(name,param,callback);
 	};
+	return it;
 
 	it.prototype = new NI_Resource();
 
+	// move outside the constructor body
 	it.prototype.load = function(name,param,callback) {
 		var moduleConfig = this._config(name);
 		var paramConfig = param.clone();
@@ -74,9 +80,13 @@ function NI_ModuleLoader() {
 	return it;
 };
 
+NI_ModuleLoader.prototype = new NI_Resource('module');
+
 // Config loader
 //
 function NI_ConfigLoader() {
 	this.prototype = function(name) {
 	};
 };
+
+NI_ConfigLoader.prototype = new NI_Resource('config');
