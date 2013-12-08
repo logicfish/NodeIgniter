@@ -78,7 +78,7 @@ Automatically assign loaders to assignable objects, for example folders and .js 
 * modules/**name**/models/ index.js | **name**.js | **name**/
 * modules/**name**/views/
 
-The _module.resources_, _module.models_ and _module.views_ objects are automatically created by the framework which iterates the file-system looking for loadable items.  This enables clients to load objects using the _module.models('name')_ syntax, simply by creating the relevant folder (models/).  The default folders, config/ and modules/, are pre-registered in the framework (using [autoload]) to allow for their special semantics.  
+The _module.resources_, _module.models_ and _module.views_ objects are automatically created by the framework which iterates the file-system looking for loadable items.  This enables clients to load objects using the _module.models('name')_ syntax, simply by creating the relevant folder (models/).  The default folders, config/ and modules/, are pre-registered in the framework (using [autoload] [0]) to allow for their special semantics.  
 Users can override the default loaders for the automatically assigned classes by creating the classes MY _ Model and MY _ View (MY _  followed by the name of the loader with the initial letter capitialised) which will be loaded by the framework instead of the default loader classes.  The default system loader is NI _ ResourceLoader .  A MY _ ResourceLoader class would override the default loader.  
 Loaders default to using a require(...) statement to create the resource object, and assign a property of the same name to it's prototype with it's value as the resource object.  
 
@@ -115,8 +115,8 @@ Load different module versions and imported namespace.
 
 ### Resources
 Useful nodejs modules:
-* [autoload]
-* [hashish]
+* [autoload] [0]
+* [hashish] [1]
 
-[autoload]:(https://github.com/laverdet/node-autoload)
-[hashish]:(https://github.com/substack/node-hashish)
+[0]: https://github.com/laverdet/node-autoload
+[0]: https://github.com/substack/node-hashish
