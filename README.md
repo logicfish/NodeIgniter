@@ -119,4 +119,4 @@ Useful nodejs modules:
 * [hashish] [1]
 
 [0]: https://github.com/laverdet/node-autoload
-[0]: https://github.com/substack/node-hashish
+[1]: https://github.com/substack/node-hashish
