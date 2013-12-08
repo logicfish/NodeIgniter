@@ -90,7 +90,7 @@ A module import may reference an npm module if their is a matching one available
 
 ### Local Module Configuration Prototypes
 
-The module config object is created during an import, before creating the import object (part of the module instance).  The config object also uses a prototype heirarchy to allow local overrides.  At the high end are config objects created from the exporting module's config/ folder (the config loader is used to read a configuration with the same name as the module).  If the module is a sub-module, parent modules are also scanned for config objects which are included in the prototype chain.  The exported config objects are attached to the module exports.  These are used to create prototypes for module imports, which allow for modules to override any of the config settings.  If a module contains a config with a name matching an imported module, the named config object will have it's prototype set to the config of the exporting module.  
+The module config object is created during an import, before creating the import object (part of the module instance).  The config object also uses a prototype heirarchy to allow local overrides.  At the high end are config objects created from the exporting module's config/ folder (the config loader is used to read a configuration with the same name as the module).  If the module is a sub-module, parent modules are also scanned for config objects which are included in the prototype chain.  The exported config objects are attached to the module exports.  These are used to create prototypes for module imports, which allow for importing modules to override any of the config settings.  (An application can override settings globally for every module).  If a module contains a config with a name matching an imported module, the named config object will have it's prototype set to the config of the exporting module.  
 
 When an import occurs, the framework creates an object with it's prototype set to the value of the local config object (from the importing module) with the same name as the imported module.  This object is attached to the 'module' object which is passed to the callback in the importing module.  We're not done yet - we make a clone of the application (global) config object of the same name as the importing module; we set this objects prototype to the object we just created.  This is the object that will be attached to the module instance, and available to functions inside the module to access their config settigns.  This gives files in the application's top level configs/ folder (and the config.js file) a special power.  They allow us to override per-module settings globally.  
 
@@ -130,6 +130,9 @@ Load different module versions and imported namespace.
 		this.prototype.myvar = module.config.myvar;
 	};
 
+	// inside a module
+	var foo = this.module('foo'); // sub-module
+	var bar = this.config.bar; // config variable.
 
 ### Resources
 Useful nodejs modules:
