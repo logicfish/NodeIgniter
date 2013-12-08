@@ -3,11 +3,15 @@ NodeIgniter
 
 The aim of this project is to create a Laravel style modular framework for node-js.
 
+We're also going to ignite node, setting it on fire.
+
 
 Proposed structure
 ------------------
 
-### Module loading
+The difference between this type of loading and the default 'require' from commonjs, is that this loader creates a type heirarchy from 'module.exports' which caters for both global and local overrides, and also allows for injection semantics.  A node-igniter module or application creates a 'class' which is instantiated by the framework and exposed to other modules via local and global hashing.  
+
+### Heirarchial Module loading
 
 	var NodeIgniter = require('node-igniter');
 
@@ -66,7 +70,7 @@ Module name/versions are hashed in a global registry, however if a module contai
 
 Configuration objects are also managed using prototypes, so that all modules access a global configuration set, and may also include their own private configurations which may include local overrides for global settings.  When a module is loaded, a unique configuration object is created for that module, with it's prototype set to the global configuration object.
 
-Sub-modules may be declared public or private.  If they are public, they will be bound to the global namespace; otherwise, they will only be visible from the parent module.
+Sub-modules may be declared public or private.  If they are public, they will be bound to the global namespace; otherwise, they will only be visible from the parent module.  Declaring a sub-module as public is directly equivalent to creating a top-level module of the same name/version.
 
 ### Ideas
 
@@ -105,9 +109,14 @@ Generic 'resource' function which allows URI mapping and loads any resource type
 	this.resource('sysconfig:/temp');
 map an individual item or property:
 	var bar = this.resource('config:sys/foo#bar');
+nested properties:
 	var foobar = this.resource('config:sys/foo#bar/foobar');
-send some custom parameters:
-	var foo = this.resource('foo:/bar#doSomething',{ foo : 'bar' });
+	var foobar = this.resource('config:sys/foo#bar.foobar');
+send some custom parameters (functor):
+	var foo = this.resource('foo:/bar#doSomething',{ foo : 'bar' })();
+
+reference parameters:
+	var foo = this.resource('http://localhost:8080/foo?a=$a&b=$b',{a:'foo',b:'bar'}).get();
 
 The resource loader provides a generic lookup and query engine for the framework.
 
@@ -140,8 +149,12 @@ The resource tree is identical to the modular heirarchy, with the 'modules' fold
 Variables: the syntax **$symbol** inside a URI is translated to a config lookup, and replaced with the value of the local configuration var of the same name, if one exists.
 Example: file:$dirname/res.txt
 
+Extending the loader
+We can easily create additional loaders for a schema and register these globally.
+For example, we could create loaders for URI schemas "fiber:..." or "backbone:...", which would then be available to all modules.  The lookup would return 'undefined' if the loader is not registered, which allows for lose-coupling.
+
 ### Local Module Configuration Prototypes
-When functions defined in a module access their local configuration (via this.config, or this.foo), they will be accessing the object created during the module import, containing local per-module (and per-import) overrides, which in turn may be overridden by the global app config.
+When functions defined in a module access their local configuration (via this.config, or this.foo), they will be accessing the object created during the module import, containing local per-module (and per-import) overrides, which in turn may be overridden by the global app config.  The same happens when they acces the resource layer - local resources will override inherited ones, but the application can create global overrides which cannot be modified.
 
 The module config object is created during an import, before creating the import object (part of the module instance).  The config object also uses a prototype heirarchy to allow local overrides.  At the high end are config objects created from the exporting module's config/ folder (the config loader is used to read a configuration with the same name as the module).  If the module is a sub-module, parent modules are also scanned for config objects which are included in the prototype chain.  The exported config objects are attached to the module exports.  These are used to create prototypes for module imports, which allow for importing modules to override any of the config settings.  (An application can override settings globally for every module).  If a module contains a config with a name matching an imported module, the named config object will have it's prototype set to the config of the exporting module.  
 
