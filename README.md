@@ -153,6 +153,10 @@ Extending the loader
 We can easily create additional loaders for a schema and register these globally.
 For example, we could create loaders for URI schemas "fiber:..." or "backbone:...", which would then be available to all modules.  The lookup would return 'undefined' if the loader is not registered, which allows for lose-coupling.
 
+Versioning semantics built in; 
+Resources defined as 'module:/**name**/**version**/myFunction'
+and 'config:/**name**/**version**/myVar' are available as 'module:/**name**/myFunction' where the latest version is used if none is specified.  Patterns from 'semver' may be used: 'config:/**name**/0.1.&star;/myVar'.
+
 ### Local Module Configuration Prototypes
 When functions defined in a module access their local configuration (via this.config, or this.foo), they will be accessing the object created during the module import, containing local per-module (and per-import) overrides, which in turn may be overridden by the global app config.  The same happens when they acces the resource layer - local resources will override inherited ones, but the application can create global overrides which cannot be modified.
 
