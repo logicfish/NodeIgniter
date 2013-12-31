@@ -1,0 +1,8 @@
+{
+	"node" : {
+		"exec" : "node"
+	},
+	"npm" : {
+		"exec" : "npm"
+	}
+}
