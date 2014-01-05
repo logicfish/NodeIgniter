@@ -2,5 +2,6 @@
 	"niVersion" : "0.1",
 	"sysDirs" : [ "@dirname/sys" ],
 	"sysConfigDirs" : [ "@dirname/sys/config", "@dirname/config" ],
-	"sysModuleDirs" : [ "@dirname/sys/modules" ]
+	"sysModuleDirs" : [ "@dirname/sys/modules" ],
+	"appDefault" : "ni"
 }

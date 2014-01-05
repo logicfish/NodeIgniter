@@ -1,0 +1,24 @@
+{
+  "name": "NodeIgniter",
+  "version": "0.1.0",
+  "description": "NodeIgniter",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "start" : "node index.js"
+  },
+  "repository": "",
+  "keywords": [
+    "Node.js",
+    "Eclipse",
+    "Nodeclipse"
+  ],
+  "author": "",
+  "license": "BSD",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "log4js": "~0.6.9",
+    "assert": "~1.1.0",
+    "optimist": "~0.6.0"
+  }
+}
