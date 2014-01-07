@@ -113,10 +113,7 @@ NI_Main.prototype.sysLocator = function(type,name,props) {
 					if(name in _res) {
 						logger.trace('sysLocator found js '+fname + " . "+name);
 						resource = _res[name];
-						//if(typeof props !== 'undefined') {
-							//resource.__proto__ = props;
 						NI_Main.makeResource(props, resource);
-						//}
 					}
 				}
 
