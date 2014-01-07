@@ -65,4 +65,5 @@ describe('Object', function() {
 
 		});
 	});
+
 });

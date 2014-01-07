@@ -12,3 +12,4 @@ var argv = require('optimist').argv;
 var NI_Main = require(path.join(__dirname,'lib','main')).NI_Main;
 
 new NI_Main().run();
+
