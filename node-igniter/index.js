@@ -11,34 +11,32 @@ var argv = require('optimist').argv;
 
 var NI_Main = require(path.join(__dirname,'lib','main')).NI_Main;
 
-
+/*
 var ni = new NI_Main();
 
 ni.events().hook('app/Start',function(event){
-	logger.debug('app/Start ' + ni.app.appVersion + " - "+ni.app.appDesc);
 	return function() {
-		var res=-1,err;
+		logger.debug('app/Start ' + ni.app.appVersion + " - "+ni.app.appDesc);
+		var res=-1;
 		try {
 			res = ni.app.main(argv);
-		} catch(_err) {
-			err = _err;
-		}
-		ni.app.close(res);
-		if(err) {
-			throw err;
+		} finally {
+			ni.app.close(res);
 		}
 	}
 });
 ni.events().hook('app/Close',function(event){
-	logger.debug('app/Close ' + ni.app.appVersion + " - "+ni.app.appDesc);
 	return function() {
-		logger.trace('app/Close#exit');
+		logger.debug('app/Close ' + ni.app.appVersion + " - "+ni.app.appDesc);
 		event.source().exit(event.props());
 	};
 });
 
-ni.app(argv['app'],function (app){
+ni.app(argv.app,function (app){
 	logger.info('loaded app niVersion-' + ni.config('config').niVersion);
 	app.start();
 });
 
+*/
+
+new NI_Main().run();

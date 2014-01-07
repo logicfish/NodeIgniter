@@ -27,11 +27,10 @@ function NI_Main() {
 
 	//this._resource = require(path.join(__dirname,'resource')).NIResource;
 	this._resource = this.lib('resource');
+	this._resource.ni = this;
 
 	var config = this.lib('config');
 	this._config = new config(this);
-	
-	this.config('config');
 }
 
 NI_Main.prototype.events = function(){
@@ -43,8 +42,6 @@ NI_Main.prototype.events = function(){
 NI_Main.prototype.close = function(res) {
 	var ni = this;
 	if(typeof this.app === 'object') {
-		//this.app.emit('app-close',this.app);
-		//this.app.event().post('app/Close');
 		this.app.close(res)
 	}
 //	process.nextTick(doClose);
@@ -72,47 +69,133 @@ NI_Main.prototype.locator = function(type,name) {
 	
 };
 
-NI_Main.prototype.sysLocator = function(type,name) {
+NI_Main.prototype.sysLocator = function(type,name,props) {
 	logger.trace('sysLocator '+type+' : '+name);
-	var proto,resource;
-	if(typeof name==='undefined') {
+	var staticResource,resource,resTop;
+
+	/*if(typeof name==='undefined') {
 		var fname = path.join(this.dirName,type+".json");
 		if(fs.existsSync(fname)) {
 			logger.trace('sysLocator found json '+fname);
-			proto = require(fname);
+			staticResource = require(fname);
 		}
 		fname = path.join(this.dirName,type+".js");
 		if(fs.existsSync(fname)) {
 			logger.debug('sysLocator found js '+fname);
 			resource = require(fname);
 		}
-	}
+		return NI_Main.makeResource(resource, staticResource);
+	}*/
 	if(typeof this.config.config !== 'undefined') {
 		var dirs = this.config.config.sysDirs;
 		for(var i in dirs) {
 			var dir = this.expand(dirs[i]);
-			var fname = path.join(dir,type,name+".json");
-			logger.trace('sysLocator search '+fname);
-			if(fs.existsSync(fname)) {
-				logger.trace('sysLocator found json '+fname);
-				proto = require(fname);
-			}
-			fname = path.join(dir,type,name+".js");
-			logger.trace('sysLocator search '+fname);
-			if(fs.existsSync(fname)) {
-				logger.trace('sysLocator found js '+fname);
-				resource = require(fname);
+			if(typeof name === 'function') {
+				logger.debug("sysEnum -- "+path.join(dir,type));
+				var cb = name;
+//				fs.readdir(path.join(dir,type),function(err,files){
+//					if(err) {
+//						logger.warn(err);
+//						throw err;
+//					}
+//					logger.debug("enum -- "+files.toString());
+//					files.each(function(fname){cb(fname);});					
+//				});
+				var files = fs.readdirSync(path.join(dir,type));
+				files.forEach(function(fname){
+					cb(fname);
+				});
+			} else {
+				var fname = path.join(dir,type,"index.js");
+				logger.trace('sysLocator file '+name+" @ "+fname);
+				if(fs.existsSync(fname)) {
+					var _res = require(fname);
+					if(name in _res) {
+						logger.trace('sysLocator found js '+fname + " . "+name);
+						resource = _res[name];
+						//if(typeof props !== 'undefined') {
+							//resource.__proto__ = props;
+						NI_Main.makeResource(props, resource);
+						//}
+					}
+				}
+
+				fname = path.join(dir,type,name+".js");
+				logger.trace('sysLocator file '+fname);
+				if(fs.existsSync(fname)) {
+					logger.trace('sysLocator found js '+fname);
+					if(typeof resource !== 'undefined') {
+						//resource = NI_Main.makeResource(resource,_resource);
+						throw new Error("Class already defined for "+fname);
+					} else {
+						resource = require(fname);
+						if(typeof props !== 'undefined') {
+//							resource.__proto__ = props;
+							NI_Main.makeResource(props, resource);
+						}
+					}
+				}				
+
+				if(typeof resource === 'undefined') {
+					resource = props;
+				}
+				
+				fname = path.join(dir,type,"index.json");
+				logger.trace('sysLocator file '+name+" @ "+fname);
+				if(fs.existsSync(fname)) {
+					var _res = require(fname);
+					if(name in _res) {
+						logger.trace('sysLocator found json '+fname + " . " + name);
+						if(typeof resource!=='undefined') {
+							//_res[name].__proto__ = resource;
+							NI_Main.makeResource(resource,_res[name]);
+						}
+						if(typeof staticResource !== 'undefined') {
+							//staticResource = NI_Main.makeResource(staticResource,_res);
+							//_res[name].__proto__ = staticResource;
+							NI_Main.makeResource(staticResource,_res[name]);
+						}
+						staticResource = _res[name];
+					}
+				}
+				
+				fname = path.join(dir,type,name+".json");
+				logger.trace('sysLocator file '+fname);
+				if(fs.existsSync(fname)) {
+					logger.trace('sysLocator found json '+fname);
+					var _res = require(fname);
+					if(typeof resource!=='undefined') {
+						//_res.__proto__ = resource;
+						NI_Main.makeResource(resource,_res);
+					}
+					if(typeof staticResource !== 'undefined') {
+						staticResource = NI_Main.makeResource(staticResource,_res);
+					} else {
+						staticResource = _res;
+					}
+				}
 			}
 		}
 	}
-	return NI_Main.makeResource(proto,resource);
+//	if(typeof resource === 'undefined' && typeof props!=='undefined') {
+//		if(typeof resource !== 'undefined') {
+//			logger.debug("prototyping js.");
+//			resource.__proto__ = props;
+//		} else if(typeof staticResource !== 'undefined'){
+//			logger.debug("prototyping static.");
+//			//staticResource = NI_Main.makeResource(staticResource,props);
+//			props.__proto__ = staticResource;
+//			staticResource = props;
+//		}
+//	}
+	return staticResource;
 };
 
 NI_Main.prototype.modLocator = function(type,name) {
 	if(typeof this.module === 'undefined') {
 		return undefined;
 	}
-	var module = this.module;
+	var module = this.module();
 	var fname = path.join(module.path,name+".json");
 	var proto;
 	var resource;
@@ -134,9 +217,9 @@ NI_Main.prototype.app = function(name,cb) {
 	app.appName = name;
 	app.ni = this;
 		
-	app.ni.events().post(app.ni.events().event('app/Init',app));
+	this.events().post(this.events().event('app/Init',app));
 
-	//app = Object.create(app);
+//	app = Object.create(app);
 	this.app = app;
 	
 	process.nextTick(function(){
@@ -144,20 +227,7 @@ NI_Main.prototype.app = function(name,cb) {
 			cb(app);
 		}
 	});
-	/*
-	app.events().hook('app/Close',doClose);
-	function doClose(event) {
-		ni._config = undefined;
-		ni._resource = undefined;
-		ni._lib = undefined;
-		ni.app = undefined;
-		NI_Main.NI = undefined;
-		process.nextTick(function(){ni.exit(event.param);});
-	};*/
 
-	
-	//process.nextTick(function(){app.events().post(app.events().event('app/Start',app));});
-	//app.events().post(app.events().event('app/Start',app));
 	return this.app;
 };
 
@@ -181,9 +251,6 @@ NI_Main.prototype.config = function(name,cb) {
 };
 
 NI_Main.prototype.lib = function(name,libName) {
-	/*if(typeof this._lib === 'undefined') {
-		this._lib = {};
-	}*/
 	logger.trace("lib: " + name + (libName||""));
 	if(typeof this._lib[name] === 'undefined') {
 		this.loadLibSys(name,libName);
@@ -197,7 +264,7 @@ NI_Main.prototype.lib = function(name,libName) {
 NI_Main.prototype.loadLibSys = function(name,libName) {
 	logger.debug("loadLibSys: " + name + " - "+libName);
 	libName = libName || name;
-	this._lib[name] = require(path.join(__dirname,libName));
+	this._lib[name] = require(path.join(__dirname,'sys',libName));
 };
 NI_Main.prototype.loadLibMod = function(name,libName) {
 	logger.debug("loadLibMod: " + name + " - "+libName);
@@ -210,19 +277,47 @@ NI_Main.prototype.mod = function(name,param) {
 	return this._modules[name] || (this._modules[name] = this._resource.load(name,'module'));
 };
 
+NI_Main.prototype.run = function() {
+	var ni = this;
+	ni.events().hook('app/Start',function(event){
+		return function() {
+			logger.debug('app/Start ' + ni.app.appVersion + " - "+ni.app.appDesc);
+			var res=-1;
+			try {
+				res = ni.app.main(argv);
+			} finally {
+				ni.app.close(res);
+			}
+		};
+	});
+	ni.events().hook('app/Close',function(event){
+		return function() {
+			logger.debug('app/Close ' + ni.app.appVersion + " - "+ni.app.appDesc);
+			event.source().exit(event.props());
+		};
+	});
+
+	ni.app(argv.app,function (app){
+		logger.info('loaded app niVersion-' + ni.config('config').niVersion);
+		app.start();
+	});
+};
+
 NI_Main.makeResource = function(proto,resource) {
-	if(typeof resource === 'undefined' && typeof proto !== 'undefined') {
-		resource = {};
+	if(typeof proto === 'undefined') {
+		return resource;
 	}
-	if(typeof proto !== 'undefined') {
-		resource.__proto__ = proto;
+	if(typeof resource !== 'undefined') {
+		var p = resource;
+		while(p.__proto__ && p.__proto__ !== Object.prototype) {
+			p = p.__proto__;
+		}
+		p.__proto__ = proto;
 	}
-//	if(typeof resource !== 'undefined') {
-//		return Object.create(resource);
-//	}
-//	return undefined;
+
 	return resource;
 };
+
 
 module.exports.NI_Main = NI_Main;
 

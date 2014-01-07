@@ -6,8 +6,7 @@ var events = require('events');
 var log4js = require('log4js');
 
 //module.exports = Object.create(new events.EventEmitter);
-module.exports = {};
-
+//module.exports = {};
 /*module.exports.config = function(){
 	return this.ni.config.apply(this.ni,arguments);
 };*/
@@ -48,9 +47,5 @@ module.exports.run = function(argv) {
 		res = this.main(argv);
 	}
 	this.close(res);
-};
-
-module.exports.modelsLocation = function() { 
-	return "models/apps";
 };
 

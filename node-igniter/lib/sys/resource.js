@@ -17,11 +17,10 @@
 
 var path = require('path');
 
-var NI_Main = require(path.join(__dirname,'main')).NI_Main;
-
 var logger = require('log4js').getLogger('Resource');
 
-function NIResource() {}
+function NIResource() {
+}
 
 module.exports = NIResource;
 
@@ -54,15 +53,21 @@ NIResource.find = function(uri) {
 NIResource.create = function(schema,uri) { 
 	logger.debug('create '+uri);
 	if (typeof schema === 'string') {
-		schema = NIResource.findSchema(schema) || {};
+		//schema = NIResource.findSchema(schema) || { schemaName:schema };
+		schema = NIResource.findSchema(schema);
 	}
-	var o = NI_Main.NI.sysLocator(schema.modelsLocation(),uri);
+	if(typeof schema === 'undefined') {
+		throw new Error('Unknown schema.');
+	}
+	logger.debug('schema '+schema.schemaName + " @ "+schema.modelsLocation);
+	var o = NIResource.ni.sysLocator(schema.modelsLocation||schema.schemaName,uri,schema);
 	if(typeof o === 'undefined') {
 		//throw new Error('Resource not found: '+uri);
 		return undefined;
 	}
-	o.__proto__ = schema;
-	return (NIResource._uri[uri] = Object.create(o));
+	//o.__proto__ = schema;
+//	return (NIResource._uri[uri] = Object.create(o));
+	return (NIResource._uri[uri] = o);
 };
 
 NIResource.createSchema = function(name,props) {
@@ -70,17 +75,25 @@ NIResource.createSchema = function(name,props) {
 	if(typeof props === 'undefined') {
 		props = {};
 	}
-	var schema = NI_Main.NI.modLocator('models',name);
+	var schema = NIResource.ni.modLocator('models',name,props);
 
 	if(typeof schema === 'undefined') {
 		schema = {};
 	}
-	schema.__proto__ = props;
-	var _schema = NI_Main.NI.sysLocator('models',name);
-	if(typeof _schema === 'undefined') {
-		_schema = {};
+//	schema.__proto__ = props;
+	schema =  NIResource.ni.sysLocator('models',name,schema);
+	if(typeof schema === 'undefined') {
+		schema = { schemaName : '<undefined>' };
 	}
-	_schema.__proto__ = schema;
-	return _schema;
+	//_schema.__proto__ = schema;
+	//return Object.create(_schema);
+	return schema;
 };
 
+NIResource.enumResources = function(schema,cb) {
+	if (typeof schema === 'string') {
+		schema = NIResource.findSchema(schema);
+	}
+	logger.debug('enum '+schema.schemaName);
+	this.ni.sysLocator(schema.modelsLocation||schema.schemaName,cb);
+};

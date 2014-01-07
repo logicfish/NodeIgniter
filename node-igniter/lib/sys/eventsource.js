@@ -98,7 +98,11 @@ EventSource.prototype.hook = function(ev,cb) {
 		}
 	};
 	logger.debug("hook "+ev);
-	this._event.addListener(ev, onHook);
+	var _event = this._event;
+	_event.addListener(ev, onHook);
+	return function() {
+		_event.removeListener(onHook);
+	};
 };
 
 EventSource.prototype.event = function(name,source,param) {

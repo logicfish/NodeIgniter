@@ -17,7 +17,7 @@ var config = module.exports = function(ni) {
  * @returns
  */
 config.prototype.loadSys = function(name) {
-	var fname = path.join(__dirname,'../',name+".json");
+	var fname = path.join(this.ni.dirName,name+".json");
 	if(fs.existsSync(fname)) {
 		return require(fname);
 	}

@@ -1,0 +1,5 @@
+{
+	"schemaName" : "app",
+	"schemaDescription" : "Application Model",
+	"modelsLocation" : "models/apps"
+}

@@ -1,0 +1,5 @@
+{
+	"toolName" : "npm",
+	"toolHelp" : "Runs 'npm' process.",
+	"toolMain" : "npm"
+}
