@@ -15,6 +15,7 @@ app.prototype.main = function() {
 //module.exports = {};
 //module.exports.prototype = {};
 //module.exports = {};
-module.exports.main = function() {
-	this.log().info("app main " + this.config().niVersion);
+module.exports.main = function(argv) {
+	this.log().info("main " + this.ni.config().niVersion);
+	return 0;
 };
