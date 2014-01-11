@@ -1,5 +1,5 @@
 {
 	"toolName" : "npm",
 	"toolHelp" : "Runs 'npm' process.",
-	"toolMain" : "npm"
+	"toolMain" : "npm.cmd"
 }

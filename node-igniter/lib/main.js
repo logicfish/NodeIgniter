@@ -31,6 +31,9 @@ function NI_Main() {
 
 	var config = this.lib('config');
 	this._config = new config(this);
+	
+	var model = this.lib('model');
+	this._model = new model(this);
 }
 
 NI_Main.prototype.events = function(){
@@ -110,7 +113,7 @@ NI_Main.prototype.sysLocator = function(type,name,props) {
 				logger.trace('sysLocator file '+name+" @ "+fname);
 				if(fs.existsSync(fname)) {
 					var _res = require(fname);
-					if(name in _res) {
+					if(typeof _res[name] !== 'undefined') {
 						logger.trace('sysLocator found js '+fname + " . "+name);
 						resource = _res[name];
 						NI_Main.makeResource(props, resource);
@@ -209,7 +212,8 @@ NI_Main.prototype.modLocator = function(type,name) {
 
 NI_Main.prototype.app = function(name,cb) {
 	name = name || this.config().appDefault;
-	var app = this._resource.load(name,'app');
+//	var app = this._resource.load(name,'app');
+	var app = this.model('app',name);
 //	console.assert(typeof app.main !== 'undefined');
 	app.appName = name;
 	app.ni = this;
@@ -247,6 +251,45 @@ NI_Main.prototype.config = function(name,cb) {
 	return this.config[name];
 };
 
+NI_Main.prototype.model = function(type,id,cb) {
+	logger.debug("model "+type+" "+id);
+	if(typeof cb === 'undefined' && typeof id === 'function') {
+		cb = id;
+		id = undefined;
+	}
+	//if(typeof this.model[type]==='undefined') {
+	//	throw new Error("Model type not found: "+type);
+	//}
+	var model;
+	if(typeof id !== 'undefined') {
+		if(typeof this.model[type]==='undefined') {
+			this.model[type] = this._model.load(type);
+//			logger.debug("model ["+type+"]");
+//			this.model[type] = {};
+		}
+		if(typeof this.model[type][id] === 'undefined') {
+			//this.model[type][id] = this._model.load(this.model[type],id);
+			//logger.trace("model loading "+type+" "+id);
+			logger.debug("model ["+type+"] ["+id+"]");
+			model = this._model.load(this.model[type],id);
+			this.model[type][id] = model;
+		} else {
+			model = this[type][id];
+		}
+		//model = this.model[type][id];
+		//model = this.model[type];
+	} else {
+		model = this._model.load(type);
+	}
+	if(typeof cb === 'function') {
+		process.nextTick(function(){cb(model);});
+	}
+	if(model){
+		model.ni = this;
+	}
+	return model;
+};
+
 NI_Main.prototype.lib = function(name,libName) {
 	logger.trace("lib: " + name + (libName||""));
 	if(typeof this._lib[name] === 'undefined') {
@@ -279,11 +322,14 @@ NI_Main.prototype.run = function() {
 	ni.events().hook('app/Start',function(event){
 		return function() {
 			logger.debug('app/Start ' + ni.app.appVersion + " - "+ni.app.appDesc);
+//			process.on('exit',function(){
+//				ni.app.close(res);			
+//			});
 			var res=-1;
 			try {
 				res = ni.app.main(argv);
 			} finally {
-				ni.app.close(res);
+//				ni.app.close(res);
 			}
 		};
 	});

@@ -40,7 +40,7 @@ module.exports.exit = function(res) {
 	this.ni.exit(res);
 }
 
-module.exports.run = function(argv) {
+/*module.exports.run = function(argv) {
 	this.start();
 	var res = 0;
 	if(typeof this.main === 'function') {
@@ -48,4 +48,4 @@ module.exports.run = function(argv) {
 	}
 	this.close(res);
 };
-
+*/

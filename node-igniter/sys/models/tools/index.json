@@ -1,3 +1,27 @@
 {
-	"myTool" : { "toolName" : "myTool","toolHelp" : "My Tool Help","toolMain":"my Tool" }
+	"help" : {
+		"toolName" : "help",
+		"toolHelp" : "Show help."
+	},
+	"prompt" : {
+		"toolName" : "prompt",
+		"toolHelp" : "Start interactive session."		
+	},
+	"test" : { 
+		"toolName" : "test",
+		"toolHelp" : "Run unit tests.",
+		"toolMain" : "mocha.cmd"
+	},
+	"env" : {
+		"toolName" : "env",
+		"toolMain" : "c:\\MinGW\\msys\\1.0\\bin\\env.exe"
+	},
+	"express" : {
+		"toolName" : "express",
+		"toolMain" : "express.cmd"
+	},
+	"docpad" : {
+		"toolName" : "docpad",
+		"toolMain" : "docpad.cmd"
+	}
 }

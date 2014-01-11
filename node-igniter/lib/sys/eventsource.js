@@ -6,7 +6,7 @@
  */
 var events = require('events');
 var log4js = require('log4js');
-var logger = log4js.getLogger("EventSource");
+var logger = log4js.getLogger("lib:EventSource");
 
 module.exports = EventSource;
 
@@ -33,8 +33,9 @@ EventObject.prototype.source = function() {
 }
 
 function EventSource() {
-	this._event = new events.EventEmitter();
 };
+
+EventSource.prototype = new events.EventEmitter();
 
 /**
  * Post and event.  Invokes all 'hooks' on the event name.
@@ -71,7 +72,7 @@ EventSource.prototype.post = function(event,cb) {
 	}
 	var name = event instanceof EventObject ? event.name() : event;
 	logger.debug("Post "+name);
-	this._event.emit(name,event,onPost);
+	this.emit(name,event,onPost);
 };
 
 /**
@@ -98,8 +99,8 @@ EventSource.prototype.hook = function(ev,cb) {
 		}
 	};
 	logger.debug("hook "+ev);
-	var _event = this._event;
-	_event.addListener(ev, onHook);
+	var _event = this;
+	this.addListener(ev, onHook);
 	return function() {
 		_event.removeListener(onHook);
 	};

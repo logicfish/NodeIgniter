@@ -6,6 +6,7 @@
  */
 var path = require('path');
 var fs = require('fs');
+var logger = require('log4js').getLogger('lib:Config');
 
 var config = module.exports = function(ni) {
 	this.ni = ni;

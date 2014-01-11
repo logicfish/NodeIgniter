@@ -7,7 +7,25 @@ var log4js = require('log4js');
 var logger = log4js.getLogger("NI");
 
 var path = require('path');
-var argv = require('optimist').argv;
+
+log4js.loadAppender('file');
+log4js.addAppender(log4js.appenders.file('logs/ni.log'),"[all]");
+
+//log4js.configure({
+//	  "appenders": [
+//	      {
+//	          type: "console"
+//	        , category: "console"
+//	      },
+//	      {
+//	          "type": "file",
+//	          "filename": "logs/ni.log",
+//	          "maxLogSize": 1024,
+//	          "backups": 3,
+//	          "category": "[all]"
+//	      }
+//	  ]
+//	});
 
 var NI_Main = require(path.join(__dirname,'lib','main')).NI_Main;
 

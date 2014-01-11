@@ -1,0 +1,14 @@
+
+Codebase
+ * Change NI_Main to NI_Reactor or create new class.
+ * Simple platform detection: 
+	platform.os.name = [ win | linux | macos | ... ]
+	platform.os.ver = { vista | win7 | ... }
+	platform.cpu.name = [ x86 | ia64 | sparc | ... ]
+	platform.node.version = [ ... ]
+ * Simple workflow engine + parser.
+ * Model parser.
+
+Platform
+ * Test multiple node versions. 
+

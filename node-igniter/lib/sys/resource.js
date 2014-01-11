@@ -16,8 +16,8 @@
  */
 
 var path = require('path');
-
-var logger = require('log4js').getLogger('Resource');
+var util = require("util");
+var logger = require('log4js').getLogger('lib:Resource');
 
 function NIResource() {
 }
@@ -28,7 +28,6 @@ NIResource._schema = {};
 NIResource._uri = {};
 
 NIResource.load = function(uri,schema,cb) {
-	logger.info('load '+uri);
 	if(typeof schema === 'function') {
 		cb = schema;
 		schema = undefined;
@@ -36,11 +35,14 @@ NIResource.load = function(uri,schema,cb) {
 	if(typeof schema === 'undefined') {
 		schema = NIResouce.schemaFor(uri);
 	} 
+	logger.info('load '+uri+' '+schema);
 	
 	return NIResource.find(uri) || NIResource.create(schema,uri);
 };
 
-NIResource.schemaFor = function(uri) { };
+NIResource.schemaFor = function(uri) {
+	logger.debug("schemaFor "+uri);
+};
 NIResource.findSchema = function(name) {
 	logger.debug('findSchema '+name);
 	return NIResource._schema[name] || (NIResource._schema[name] = NIResource.createSchema(name));
@@ -51,7 +53,7 @@ NIResource.find = function(uri) {
 };
 
 NIResource.create = function(schema,uri) { 
-	logger.debug('create '+uri);
+	logger.debug('create '+uri+' '+util.inspect(schema));
 	if (typeof schema === 'string') {
 		//schema = NIResource.findSchema(schema) || { schemaName:schema };
 		schema = NIResource.findSchema(schema);
@@ -60,6 +62,9 @@ NIResource.create = function(schema,uri) {
 		throw new Error('Unknown schema.');
 	}
 	logger.debug('schema '+schema.schemaName + " @ "+schema.modelsLocation);
+	if(typeof uri === 'undefined') {
+		return schema;
+	}
 	var o = NIResource.ni.sysLocator(schema.modelsLocation||schema.schemaName,uri,schema);
 	if(typeof o === 'undefined') {
 		//throw new Error('Resource not found: '+uri);
@@ -77,9 +82,9 @@ NIResource.createSchema = function(name,props) {
 	}
 	var schema = NIResource.ni.modLocator('models',name,props);
 
-	if(typeof schema === 'undefined') {
-		schema = {};
-	}
+//	if(typeof schema === 'undefined') {
+//		schema = {};
+//	}
 //	schema.__proto__ = props;
 	schema =  NIResource.ni.sysLocator('models',name,schema);
 	if(typeof schema === 'undefined') {
@@ -87,6 +92,7 @@ NIResource.createSchema = function(name,props) {
 	}
 	//_schema.__proto__ = schema;
 	//return Object.create(_schema);
+	logger.debug("created schema: "+util.inspect(schema));
 	return schema;
 };
 
